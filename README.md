@@ -1,10 +1,11 @@
-# data prepareation
+# Data prepareation
 ```
 mkdir ../data
 ```
 Download `zerospeech2020.zip` and `2017_vads.zip` under ../data/ from https://zerospeech.com/challenge_archive/2020/data/ .
 
-# prepocess
+# Prepocessing
+Split audio data based on based on voice activity detection.
 ```
 python scripts/segment_by_vad.py \
     --data-dir ../data/2020/2017/mandarin/train \
@@ -12,10 +13,14 @@ python scripts/segment_by_vad.py \
     --lang mandarin
 ```
 
-# cpc
-https://github.com/tuanh208/CPC_audio/tree/zerospeech
+# Training
+
+## CPC
+Train CPC model using the implimentation at https://github.com/tuanh208/CPC_audio/tree/zerospeech .
 
 ```
+git clone https://github.com/tuanh208/CPC_audio/tree/zerospeech
+
 mkdir -p CPC_audio/checkpoints/mandarin
 
 python cpc/train.py \
@@ -28,7 +33,7 @@ python cpc/train.py \
     --nEpoch 5000 --save_step 100 --n_process_loader 8
 ```
 
-# AE pretrain
+## Encoder pretraining
 ```
 mkdir -p checkpoints/mandarin
 
@@ -46,7 +51,7 @@ python scripts/train.py \
     --lang mandarin --train-AE
 ```
 
-# Train NN-ES-KMeans
+## NN-ES-KMeans
 ```
 python scripts/train.py \
     --cpc-path CPC_audio/checkpoints/mandarin/checkpoint_0.pt \
@@ -64,7 +69,7 @@ python scripts/train.py \
     # --segment-temp 2 --cluster-temp 0.1
 ```
 
-# Evaluate
+# Evaluation
 ```
 python scripts/eval.py \
     --cpc-path CPC_audio/checkpoints/mandarin/checkpoint_0.pt \
@@ -78,7 +83,7 @@ python scripts/eval.py \
     --input-dim 512 --output-dim 512 --lang mandarin
 ```
 
-https://github.com/zerospeech/zerospeech2020
+Evaluate using zerospeech2020 evaluation toolkit: https://github.com/zerospeech/zerospeech2020
 ```
 zerospeech2020-evaluate 2017-track2 results/mandarin -l mandarin -o results/mandarin/result.json
 ~~~
