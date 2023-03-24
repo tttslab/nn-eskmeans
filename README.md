@@ -5,7 +5,7 @@ mkdir ../data
 Download `zerospeech2020.zip` and `2017_vads.zip` under ../data/ from https://zerospeech.com/challenge_archive/2020/data/ .
 
 # Prepocessing
-Split audio data based on based on voice activity detection.
+Split audio data based on voice activity detection.
 ```
 python scripts/segment_by_vad.py \
     --data-dir ../data/2020/2017/mandarin/train \
@@ -22,10 +22,11 @@ Train CPC model using the implimentation at https://github.com/tuanh208/CPC_audi
 git clone https://github.com/tuanh208/CPC_audio/tree/zerospeech
 
 mkdir -p CPC_audio/checkpoints/mandarin
+cd CPC_audio
 
 python cpc/train.py \
     --pathDB ../../data/2020/2017/mandarin/train/segment_by_vad \
-    --pathCheckpoint CPC_audio/checkpoints/mandarin \
+    --pathCheckpoint checkpoints/mandarin \
     --pathTrain ../../data/2020/2017/mandarin/train/segment_by_vad/keylist_mandarin_segment_by_vad.txt \
     --pathVal ../../data/2020/2017/mandarin/train/segment_by_vad/keylist_mandarin_segment_by_vad_val.txt \
     --file_extension .wav --ignore_cache \
@@ -70,6 +71,7 @@ python scripts/train.py \
 ```
 
 # Evaluation
+Conduct word segmentation and clustering.
 ```
 python scripts/eval.py \
     --cpc-path CPC_audio/checkpoints/mandarin/checkpoint_0.pt \
@@ -86,4 +88,4 @@ python scripts/eval.py \
 Evaluate using zerospeech2020 evaluation toolkit: https://github.com/zerospeech/zerospeech2020
 ```
 zerospeech2020-evaluate 2017-track2 results/mandarin -l mandarin -o results/mandarin/result.json
-~~~
+```
