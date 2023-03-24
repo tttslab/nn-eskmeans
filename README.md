@@ -1,8 +1,9 @@
 # Data prepareation
+Make directory for training dataset.
 ```
 mkdir ../data
 ```
-Download `zerospeech2020.zip` and `2017_vads.zip` under ../data/ from https://zerospeech.com/challenge_archive/2020/data/ .
+Download `zerospeech2020.z*` and `2017_vads.zip` under ../data/ from https://zerospeech.com/challenge_archive/2020/data/ .
 
 # Prepocessing
 Split audio data based on voice activity detection.
@@ -16,11 +17,14 @@ python scripts/segment_by_vad.py \
 # Training
 
 ## CPC
-Train CPC model using the implimentation at https://github.com/tuanh208/CPC_audio/tree/zerospeech .
+Train CPC model for future extraction using the implimentation at https://github.com/tuanh208/CPC_audio/tree/zerospeech .
+Clone repository and follow the instruction.
 
 ```
 git clone https://github.com/tuanh208/CPC_audio/tree/zerospeech
-
+```
+Make directory and train CPC model.
+```
 mkdir -p CPC_audio/checkpoints/mandarin
 cd CPC_audio
 
@@ -35,6 +39,7 @@ python cpc/train.py \
 ```
 
 ## Encoder pretraining
+Pretrain the encoder by forming a sequential autoencoder.
 ```
 mkdir -p checkpoints/mandarin
 
@@ -53,6 +58,7 @@ python scripts/train.py \
 ```
 
 ## NN-ES-KMeans
+Train NN-ES-KMeans. `--segment-temp` and `cluster-temp` are options for random samplings using the Gumbel-Max trick.
 ```
 python scripts/train.py \
     --cpc-path CPC_audio/checkpoints/mandarin/checkpoint_0.pt \
@@ -64,7 +70,7 @@ python scripts/train.py \
     --max-tokens 12000 --update-max-tokens 144000 \
     --nneskmeans-inner-batch-size  2048 \
     --word-size 500 --min-len 15 --max-len 50 \
-    --num-epoch 1000 --lr 0.0001 --save-epoch 10 --lr-step 0 --warm-step 10\
+    --num-epoch 300 --lr 0.0001 --save-epoch 10 --lr-step 0 --warm-step 10\
     --log-interval 10 --log-dir checkpoints/mandarin/nneskmeans/log --input-dim 512 --output-dim 512 \
     --lang mandarin --loss-weight 0.25 --encoder-grad
     # --segment-temp 2 --cluster-temp 0.1
